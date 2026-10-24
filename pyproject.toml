@@ -1,0 +1,12 @@
+[project]
+name = "23l0561-a2-ops"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "saadwaqar", email = "saadwaqar211@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "counter>=1.0.0",
+]

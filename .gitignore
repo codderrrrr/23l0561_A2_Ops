@@ -1,0 +1,23 @@
+# Python / Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+.python-version
+
+# IDEs & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# MLflow & Local Artifacts / Logs
+mlruns/
+wandb/
+.env
+
+# DVC local storage (keep data folders untracked by git since DVC handles them)
+/data/
+/dataset/
