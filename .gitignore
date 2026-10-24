@@ -20,4 +20,4 @@ wandb/
 
 # DVC local storage (keep data folders untracked by git since DVC handles them)
 data/archive/*
-!data/archive/.gitignore
+!data/.gitignore
