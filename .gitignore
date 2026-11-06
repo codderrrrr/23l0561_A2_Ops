@@ -21,3 +21,22 @@ wandb/
 # DVC local storage (keep data folders untracked by git since DVC handles them)
 data/archive/*
 !data/.gitignore
+
+.env
+
+mlflow.db
+mlruns/
+dvc.lock
+
+vg_tuner_dir/
+
+Artifacts/
+*.keras
+
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+data/archive/
+!data/.gitignore
