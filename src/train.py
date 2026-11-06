@@ -11,18 +11,21 @@ import os
 import seaborn as sns
 import mlflow
 import subprocess
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 SEED = 42
 BATCH_SIZE = 32
 tf.random.set_seed(SEED)
 
 USE_AUTOLOG = False
-RUN_NAME = 'run_1'
-MODEL_TYPE = 'baseline'  # Options: 'baseline', 'transfer', 'finetune'
+RUN_NAME = 'finetune_6'
+MODEL_TYPE = 'finetune'  # Options: 'baseline', 'transfer', 'finetune'
 LEARNING_RATE = 1e-4
 IMAGE_SIZE = 224
-UNFREEZE_CONV5_ONLY = True 
-OPTIMIZER = 'adam'
+UNFREEZE_CONV5_ONLY = False  # If True, only unfreeze the last conv5 block of ResNet50 during fine-tuning 
+OPTIMIZER = 'rmsprop'
 
 username = os.environ.get("DAGSHUB_USERNAME")
 token = os.environ.get("DAGSHUB_TOKEN")
@@ -70,6 +73,10 @@ labels = df['label']
 
 train_paths, temp_paths, train_labels, temp_labels = train_test_split(file_paths, labels, test_size=0.3, random_state=SEED)
 val_paths, test_paths, val_labels, test_labels = train_test_split(temp_paths, temp_labels, test_size=0.5, random_state=SEED)
+
+train_paths.to_csv("Artifacts/train_split.csv", index=False)
+val_paths.to_csv("Artifacts/val_split.csv", index=False)
+test_paths.to_csv("Artifacts/test_split.csv", index=False)
 
 train_ds = create_dataset(train_paths, train_labels, is_train=True)
 val_ds   = create_dataset(val_paths, val_labels, is_train=False)
@@ -119,7 +126,10 @@ with mlflow.start_run(run_name=RUN_NAME):
                 pass
             
         transfer_model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE),
+            optimizer=tf.keras.optimizers.deserialize({
+                "class_name": OPTIMIZER,
+                "config": {"learning_rate": LEARNING_RATE}
+            }),
             loss='binary_crossentropy',
             metrics=['accuracy', tf.keras.metrics.Precision(), tf.keras.metrics.Recall()]
         )
@@ -131,7 +141,7 @@ with mlflow.start_run(run_name=RUN_NAME):
     model.save(f'Artifacts/{MODEL_TYPE}_cnn.keras')
     
     if not USE_AUTOLOG:
-        mlflow.tensorflow.log_model(model, "trained_model") # type: ignore
+        mlflow.keras.log_model(model, "trained_model") # type: ignore
 
     model = tf.keras.models.load_model(f'Artifacts/{MODEL_TYPE}_cnn.keras')
 
@@ -152,7 +162,7 @@ with mlflow.start_run(run_name=RUN_NAME):
             best_f1 = current_f1
             threshold = thresh
             
-    mlflow.log_metric("best_threshold", threshold)
+    mlflow.log_metric("best_threshold", float(threshold))
     print(f"Best threshold found: {threshold:.2f} (F1-Score: {best_f1:.4f})")
     test_pred = (test_probs > threshold).astype(int)
     
@@ -197,33 +207,36 @@ with mlflow.start_run(run_name=RUN_NAME):
     plt.close()
     mlflow.log_artifact("Artifacts/roc_curve.png")
 
-misclassified_images = []
+    misclassified_images = []
 
-for path, true_label, pred_label, prob in zip(test_paths, test_true, test_pred, test_probs):
-    if true_label != pred_label:
-        misclassified_images.append({
-            'path': path,
-            'true_label': true_label,
-            'pred_label': pred_label,
-            'pred_prob': prob
-        })
+    for path, true_label, pred_label, prob in zip(test_paths, test_true, test_pred, test_probs):
+        if true_label != pred_label:
+            misclassified_images.append({
+                'path': path,
+                'true_label': true_label,
+                'pred_label': pred_label,
+                'pred_prob': prob
+            })
 
-top_10_errors = misclassified_images[:10]
-print(f"\nFound {len(misclassified_images)} total errors. Plotting the first 10...")
+    top_10_errors = misclassified_images[:10]
+    print(f"\nFound {len(misclassified_images)} total errors. Plotting the first 10...")
 
-fig, axes = plt.subplots(2, 5, figsize=(20, 8))
-axes = axes.flatten() 
+    if len(top_10_errors) > 0:
+        fig, axes = plt.subplots(2, 5, figsize=(20, 8))
+        axes = axes.flatten() 
 
-for i, err in enumerate(top_10_errors):
-    img = tf.keras.utils.load_img(err['path'])
-    axes[i].imshow(img)
-    
-    true_name = "FAKE" if err['true_label'] == 1 else "REAL"
-    pred_name = "FAKE" if err['pred_label'] == 1 else "REAL"
-    
-    axes[i].set_title(f"True: {true_name}\nPred: {pred_name}\nProb: {err['pred_prob']:.2f}")
-    axes[i].axis('off') 
+        for i, err in enumerate(top_10_errors):
+            img = tf.keras.utils.load_img(err['path'])
+            axes[i].imshow(img)
 
-plt.suptitle("10 Misclassified Test Images")
-plt.tight_layout()
-plt.show()
+            true_name = "FAKE" if err['true_label'] == 1 else "REAL"
+            pred_name = "FAKE" if err['pred_label'] == 1 else "REAL"
+
+            axes[i].set_title(f"True: {true_name}\nPred: {pred_name}\nProb: {err['pred_prob']:.2f}")
+            axes[i].axis('off') 
+
+        plt.suptitle("Misclassified Test Images")
+        plt.tight_layout()
+        fig = plt.gcf() 
+        mlflow.log_figure(fig, f"{MODEL_TYPE}_errors.png")
+        plt.close(fig) 

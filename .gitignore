@@ -13,6 +13,8 @@ env/
 .DS_Store
 Thumbs.db
 
+tests/test_*.jpg
+
 # MLflow & Local Artifacts / Logs
 mlruns/
 wandb/
