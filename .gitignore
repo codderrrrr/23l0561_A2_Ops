@@ -13,14 +13,14 @@ env/
 .DS_Store
 Thumbs.db
 
+toy_tuning_dir
+
 tests/test_*.jpg
 
-# MLflow & Local Artifacts / Logs
 mlruns/
 wandb/
 .env
 
-# DVC local storage (keep data folders untracked by git since DVC handles them)
 data/archive/*
 !data/.gitignore
 
@@ -41,4 +41,4 @@ __pycache__/
 *.pyc
 
 data/archive/
-!data/.gitignoretoy_tuning_dir/
+!data/.gitignore
