@@ -7,6 +7,10 @@ env/
 .venv/
 .python-version
 
+instance/history.db
+src/toy_code/loss_plot_run2.png
+src/toy_code/loss_plot_run1.png
+
 # IDEs & OS files
 .vscode/
 .idea/
