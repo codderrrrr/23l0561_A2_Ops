@@ -20,7 +20,7 @@ BATCH_SIZE = 32
 tf.random.set_seed(SEED)
 
 USE_AUTOLOG = True
-RUN_NAME = 'baseline_1_autolog'
+RUN_NAME = 'test'
 MODEL_TYPE = 'baseline'  # Options: 'baseline', 'transfer', 'finetune'
 LEARNING_RATE = 1e-4
 IMAGE_SIZE = 224

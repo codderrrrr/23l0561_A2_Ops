@@ -48,11 +48,11 @@ def upload():
             return redirect(request.url)
         
         allowed_extensions = {'png', 'jpg', 'jpeg'}
-        if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+        if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions: # type: ignore
             flash('Invalid file type. Only PNG, JPG, or JPEG images are allowed.')
             return redirect(request.url)
         
-        filename = secure_filename(file.filename)
+        filename = secure_filename(file.filename) # type: ignore
         
         file_bytes = file.read()
         
@@ -92,11 +92,7 @@ def history():
     predictions = []
     for rec in raw_records:
         p = json.loads(rec)
-        
-        # FIX: Convert the ISO timestamp string back to a datetime object
-        # so that .strftime() works correctly in the HTML template
         p['timestamp'] = datetime.fromisoformat(p['timestamp'])
-        
         predictions.append(p)
         
     return render_template('history.html', predictions=predictions)

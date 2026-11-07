@@ -41,4 +41,4 @@ __pycache__/
 *.pyc
 
 data/archive/
-!data/.gitignore
+!data/.gitignoretoy_tuning_dir/
