@@ -34,16 +34,21 @@ print(f"Downloading from: {model_uri}")
 model = mlflow.keras.load_model(model_uri) # type: ignore
 print("Champion model loaded successfully into memory!\n")
 
-def preprocess_image(image_path):
-    image = Image.open(image_path).convert('RGB')
+def preprocess_image(image_data):
+    
+    if isinstance(image_data, bytes):
+        image = Image.open(io.BytesIO(image_data)).convert('RGB')
+    else:
+        image = Image.open(image_data).convert('RGB')
+        
     image = image.resize((224, 224))
     
     img_array = np.array(image, dtype=np.float32)
     img_array = np.expand_dims(img_array, axis=0)
     return img_array
 
-def predict_image(image_path):
-    img_array = preprocess_image(image_path)
+def predict_image(image_data):
+    img_array = preprocess_image(image_data)
     raw_prob = float(model.predict(img_array, verbose=0)[0][0]) # type: ignore
     
     threshold = best_threshold

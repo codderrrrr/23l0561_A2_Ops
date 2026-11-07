@@ -1,0 +1,22 @@
+# Ignore local virtual environments
+.venv/
+venv/
+
+# Ignore Git and MLflow/DVC tracking folders
+.git/
+mlruns/
+vg_tuner_dir/
+
+# Ignore local database and large artifacts (we will mount the model instead)
+*.db
+Artifacts/*.keras
+Artifacts/*.png
+Artifacts/*.csv
+
+# Ignore environment variables (CRITICAL for security)
+.env
+
+# Ignore OS files
+__pycache__/
+*.pyc
+.DS_Store

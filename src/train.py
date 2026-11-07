@@ -19,13 +19,13 @@ SEED = 42
 BATCH_SIZE = 32
 tf.random.set_seed(SEED)
 
-USE_AUTOLOG = False
-RUN_NAME = 'finetune_6'
-MODEL_TYPE = 'finetune'  # Options: 'baseline', 'transfer', 'finetune'
+USE_AUTOLOG = True
+RUN_NAME = 'baseline_1_autolog'
+MODEL_TYPE = 'baseline'  # Options: 'baseline', 'transfer', 'finetune'
 LEARNING_RATE = 1e-4
 IMAGE_SIZE = 224
-UNFREEZE_CONV5_ONLY = False  # If True, only unfreeze the last conv5 block of ResNet50 during fine-tuning 
-OPTIMIZER = 'rmsprop'
+UNFREEZE_CONV5_ONLY = True  # If True, only unfreeze the last conv5 block of ResNet50 during fine-tuning 
+OPTIMIZER = 'adam'
 
 username = os.environ.get("DAGSHUB_USERNAME")
 token = os.environ.get("DAGSHUB_TOKEN")
