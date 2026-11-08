@@ -179,6 +179,8 @@ sqlalchemy==2.1.8
 sqlparse==0.6.1
     # via mlflow-skinny
 starlette==1.10.0
+python-dotenv
+tensorflow-cpu
     # via fastapi
 threadpoolctl==3.8.0
     # via scikit-learn

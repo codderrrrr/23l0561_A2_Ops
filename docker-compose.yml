@@ -1,6 +1,7 @@
 services:
   web:
     build: .
+    container_name: visionguard_web
     restart: always
     ports:
       - "5000:5000"
@@ -11,14 +12,12 @@ services:
       - DAGSHUB_USERNAME=${DAGSHUB_USERNAME}
       - DAGSHUB_TOKEN=${DAGSHUB_TOKEN}
       - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
-    volumes:
-      - ./champion_model:/app/champion_model:ro
     depends_on:
       db:
         condition: service_healthy
   db:
     image: redis:7-alpine
-    restart: always
+    container_name: visionguard_db
     volumes:
       - redis_data:/data
     healthcheck:
@@ -26,6 +25,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
 volumes:
   redis_data:

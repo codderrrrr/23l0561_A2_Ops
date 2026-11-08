@@ -21,8 +21,6 @@ data/archive/
 
 toy_tuning_dir
 
-tests/test_*.jpg
-
 mlruns/
 wandb/
 .env
