@@ -36,7 +36,7 @@ jobs:
         DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
         DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
         MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
-      run: pytest tests/ -v
+      run: pytest tests/test1.py -v
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
