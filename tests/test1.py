@@ -31,10 +31,10 @@ def champion_model():
         model_name = "VisionGuard_Model"
         model_version = client.get_model_version_by_alias(name=model_name, alias="champion")
         run_id = model_version.run_id
-        run_data = client.get_run(run_id)
+        run_data = client.get_run(run_id) # type: ignore
         best_threshold = run_data.data.metrics.get("best_threshold", 0.5)
         model_uri = f"models:/{model_name}@champion"
-        model = mlflow.keras.load_model(model_uri)
+        model = mlflow.keras.load_model(model_uri) # type: ignore
         return {"model": model, "threshold": best_threshold}
     except Exception as e:
         pytest.skip(f"Failed to load model from DagsHub: {e}")
